@@ -1,0 +1,7 @@
+%p
+  = @table_to_show
+%p
+  = ModelRelation.new(@table_to_show).related_model_names
+%object{:data=>SchemaDoc.svg_public_relative_file_path(@table_to_show),:type=>"image/svg+xml"}
+%p
+  rabbit!
