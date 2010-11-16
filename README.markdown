@@ -28,20 +28,23 @@ Install it from [here][0].
 
     $ git clone git://github.com/JohnB/schema_doc.git
     $ cd schema_doc
-    $ ruby add_schema_doc_simlinks.rb `full_path_to_your_rails_app`
+    $ ruby add_schema_doc_symlinks.rb `full_path_to_your_rails_app`
 
 To see what it will do, just run it with no argument - it will show
 the symlinks to be created and the one file (routes.rb) that would be 
 modified if you gave it the path to your rails app.
 
 
+#### Other Details
+* Temporary DOT files and SVG files are stored in the public/images directory
+
+
 ToDo Items
 ----------
-* Create the add_schema_doc_simlinks.rb file
 * Verify against a fresh rails app
-* Check in the existing index-only code
 * Refactor to enable per-model pages
 * Create the per-model diagram and edit form
+* Find a better way to integrate with a Rails app (such as a Rails 3.1 engine)
 
 
 Meta
