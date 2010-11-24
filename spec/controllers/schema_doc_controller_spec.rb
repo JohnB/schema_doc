@@ -1,7 +1,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../schema_doc_spec_helper')
 
-describe SchemaDocController do
+describe SchemaDocController, :type => :controller do
 
   describe 'GET "index"' do
     it "should be successful" do

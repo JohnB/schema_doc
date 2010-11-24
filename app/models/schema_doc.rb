@@ -1,16 +1,19 @@
 
 class SchemaDoc
-  DEFAULT_FILENAME = "schema_doc_#{::Rails.env}.yml"
+  PERSISTENCE_FILENAME = "schema_doc_#{::Rails.env}.yml"
   DEFAULT_CONFIG_PATH = "#{::Rails.root.to_s}/config"
   PUBLIC_RELATIVE_TEMP_PATH = "images"
   DEFAULT_TEMP_PATH = "public/#{PUBLIC_RELATIVE_TEMP_PATH}"  # will be relative to ::Rails.root.to_s
-  DOT_FILENAME = "schema_doc.dot"
-  SVG_FILENAME = "schema_doc.svg"
+  DEFAULT_FILENAME = "schema_doc"
+  DOT_DOT = '.dot'
+  DOT_SVG = '.svg'
+  DOT_FILENAME = "schema_doc"+DOT_DOT
+  SVG_FILENAME = "schema_doc"+DOT_SVG
   DOT_PATH = "/usr/local/bin/dot"
   
   class << self
     def persistent_file_path
-      @@persistent_file_path ||= File.join(DEFAULT_CONFIG_PATH,DEFAULT_FILENAME)
+      @@persistent_file_path ||= File.join(DEFAULT_CONFIG_PATH,PERSISTENCE_FILENAME)
     end
     
     def persistent_file_path= path
@@ -33,16 +36,28 @@ class SchemaDoc
       @@dot_path = path
     end
     
+    def fix_for_filename( model_name )
+      model_name.gsub(/\:/,'_')
+    end
+  
+    def base_filename
+      fix_for_filename(@@model_name || DEFAULT_FILENAME)
+    end
+    
+    def dot_filename
+      base_filename + DOT_DOT
+    end
+    
+    def svg_filename
+      base_filename + DOT_SVG
+    end
+    
     def dot_data_relative_file_path
-      File.join(temp_dir,DOT_FILENAME)
+      File.join(temp_dir, dot_filename)
     end
     
     def svg_data_relative_file_path
-      File.join(temp_dir,SVG_FILENAME)
-    end
-    
-    def svg_public_relative_file_path
-      File.join(PUBLIC_RELATIVE_TEMP_PATH,SVG_FILENAME)
+      File.join(temp_dir, svg_filename)
     end
     
     def full_temp_dir
@@ -53,7 +68,8 @@ class SchemaDoc
       File.join(::Rails.root.to_s,dot_data_relative_file_path)
     end
     
-    def svg_data_file_path
+    def svg_data_file_path( model = nil )
+      init( model )
       File.join(::Rails.root.to_s,svg_data_relative_file_path)
     end
     
@@ -89,20 +105,36 @@ class SchemaDoc
       # rescue Exception => e
       #   puts "Something is very wrong: #{e}. #{e.backtrace}"
       end.compact
+      
+      @@model_name ||= nil
+      if @@model_name
+        # return the appropriate subset
+        names = [@@model_name]
+        names += relations_hash[@@model_name] if @@relations
+        names
+      else
+        @@models
+      end
+    end
+    
+    def init( model_name )
+      @@relations = nil if model_name
+      @@model_name = model_name
     end
     
     def relations_hash
-      @@relations ||= begin
-        model_names.inject({}) do |memo,model_name|
+      @@relations ||= model_names.inject({}) do |memo,model_name|
+        begin
           memo[model_name] = ModelRelation.new(model_name).related_model_names
+          memo
+        rescue Exception => e
+          puts "Something is wrong: #{e}. #{e.backtrace}"
           memo
         end.inject({}) do |memo,name_and_relations|
           # Force the set to be unique
           memo[name_and_relations.first] = name_and_relations.last.uniq
           memo
         end
-      rescue Exception => e
-        puts "Something is wrong: #{e}. #{e.backtrace}"
       end
       
     end
@@ -130,7 +162,7 @@ class SchemaDoc
         memo
       end
     end
-  
+    
     def dot_models
       model_names.collect do |model_name|
         "\"#{model_name}\" [
@@ -162,7 +194,16 @@ class SchemaDoc
       DOT_DATA
     end
     
-    def create_dot_file
+    def svg_public_relative_file_path( model = nil )
+      init( model )
+      path = '/' + File.join(PUBLIC_RELATIVE_TEMP_PATH, svg_filename)
+      puts "svg_public_relative_file_path(#{model}) => #{path}"
+      path
+    end
+    
+    def create_dot_file( model = nil )
+      init( model )
+      puts "create_dot_file(#{model}) => #{dot_data_file_path}"
       if File.exists?(dot_data_file_path)
         old_data = IO.read(dot_data_file_path)
         return if old_data == dot_data
@@ -171,9 +212,10 @@ class SchemaDoc
       File.open(dot_data_file_path,"w") { |f| f.write(dot_data)}
     end
   
-    def create_svg_file
-      create_dot_file
-      command = "cat #{dot_data_file_path} | #{dot_path} -Tsvg > #{svg_data_file_path}"
+    def create_svg_file( model = nil )
+      init( model )
+      create_dot_file(model)
+      command = "cat #{dot_data_file_path} | #{dot_path} -Tsvg > #{svg_data_file_path(model)}"
       puts "Running command: '#{command}'"
       `#{command}`
     end

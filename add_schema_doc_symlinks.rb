@@ -32,6 +32,7 @@ class AddSymlinks
       symlink("app/helpers/schema_doc_helper.rb"),
       symlink("app/models/model_relation.rb"),
       symlink("app/models/schema_doc.rb"),
+      symlink("app/views/layouts/schema_doc.html.haml"),
       symlink("app/views/schema_doc"),
       symlink("spec/controllers/schema_doc_controller_spec.rb"),
       symlink("spec/models/model_relation_spec.rb"),

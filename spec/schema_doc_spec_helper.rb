@@ -14,6 +14,7 @@ RSpec.configure do |config|
   def verify_file_is_created(filepath)
     FileUtils.rm_f(filepath)
     yield
+    puts "DEBUG: attempted to make #{filepath}" unless File.exists?(filepath)
     File.exists?(filepath).should be_true
   end
   

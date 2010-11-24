@@ -2,15 +2,15 @@ class SchemaDocController < ApplicationController
   MSG_CANCELED = "Changes canceled"
   MSG_SAVED = "Schema documentation updated"
   
+  layout 'schema_doc'
+  
   def index
     SchemaDoc.create_svg_file
   end
 
   def show
-    @table_to_show = params[:id]
-    # puts "ModelRelation.new(#{@table_to_show}).related_model_names"
-    # puts ModelRelation.new(@table_to_show).related_model_names
-    # puts "that was it?"
+    @table_to_show = params["id"]
+    SchemaDoc.create_svg_file(@table_to_show)
   end
   
   def update

@@ -79,7 +79,6 @@ describe SchemaDoc do
   end
   
   it "should create a specific-table's SVG file when requested" do
-    pending "refactor this test as the code to implement it is factored out to work."
     verify_file_is_created(SchemaDoc.svg_data_file_path("SchemaDocSpecBelongsTo")) do
       SchemaDoc.create_svg_file("SchemaDocSpecBelongsTo")
     end
