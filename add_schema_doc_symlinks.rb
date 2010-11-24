@@ -59,7 +59,7 @@ class AddSymlinks
     [
       "",
       "Add these lines to your config/routes.rb file:",
-      "  if RAILS_ENV == 'development'",
+      "  if ::Rails.env == 'development'",
       "    resources :schema_doc, :except => [:new, :create, :edit, :destroy]",
       "  end",
     ].each { |line| puts line }

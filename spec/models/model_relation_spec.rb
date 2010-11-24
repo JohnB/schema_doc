@@ -11,18 +11,27 @@ describe ModelRelation do
     ModelRelation.new('SchemaDocSpecBelongsTo').related_model_names.should_not be_empty
   end
   
-  it "Bbb should have no related models" do
+  it "HasOne model should have related models" do
     ModelRelation.new('SchemaDocSpecBelongsTo').related_model_names.should_not be_empty
+  end
+  
+  it "HasOne model should have no reverse-related models" do
     ModelRelation.new('SchemaDocSpecBelongsTo').reverse_related_model_names.should be_empty
   end
   
-  it "Bbb should have a reverse-related model" do
+  it "HasOne model should have a reverse-related model" do
     ModelRelation.new('SchemaDocSpecHasOne').reverse_related_model_names.should_not be_empty
+  end
+  
+  it "HasOne model should have no related models" do
     ModelRelation.new('SchemaDocSpecHasOne').related_model_names.should be_empty
   end
   
-  it "Ccc should have no related or reverse-related models" do
+  it "Lonely model should have no related models" do
     ModelRelation.new('SchemaDocSpecLonely').related_model_names.should be_empty
+  end  
+  
+  it "Lonely model should have no reverse-related models" do
     ModelRelation.new('SchemaDocSpecLonely').reverse_related_model_names.should be_empty
   end  
   
