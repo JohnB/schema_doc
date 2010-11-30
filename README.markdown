@@ -27,8 +27,8 @@ With Rails 3.1 this should become a Rails Engine but for now it is
 directory.
 
 #### Dependencies
-SchemaDoc requires that the Graphviz `dot` program be in your path. 
-Install it from [here][0].
+* The Graphviz `dot` program must be in your path. Install it from [here][0].
+# `sed` must be in your path (to work around a Graphviz issue)
 
 #### Integration with Your Rails App
 
@@ -47,10 +47,9 @@ modified if you gave it the path to your rails app.
 
 ToDo Items
 ----------
-* Verify against a fresh rails app
-* Refactor to enable per-model pages
-* Create the per-model diagram and edit form
+* Create the per-model edit form
 * Find a better way to integrate with a Rails app (such as a Rails 3.1 engine)
+* Improve the page styling
 
 
 Meta

@@ -1,1 +1,23 @@
+%h1
+  = "SchemaDoc #{@table_to_show}"
+%button{:onclick=>"window.location.href='#{schema_doc_index_path}'"}
+  Return to Overview
+%p
+  Click on a model name to see the meaning of its columns. 
 %object{:data=>SchemaDoc.svg_public_relative_file_path(@table_to_show),:type=>"image/svg+xml",:viewBox=>nil}
+%table{:border=>"3"}
+  %thead
+    %tr
+      %th Name 
+      %th Datatype 
+      %th Meaning
+  %tbody
+  - SchemaDoc.columns_to_document(@table_to_show).each do |column|
+    %tr
+      %td
+        = column.name
+      %td
+        = column.type
+      %td
+        blah
+            

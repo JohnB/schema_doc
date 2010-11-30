@@ -63,6 +63,13 @@ class AddSymlinks
       "  if ::Rails.env == 'development'",
       "    resources :schema_doc, :except => [:new, :create, :edit, :destroy]",
       "  end",
+      "",
+      "And add these lines to your Gemfile file:",
+      "  group :development, :test do",
+      "    gem 'rspec-rails', '>= 2.0'",
+      "    gem 'haml'",
+      "  end",
+      "",
     ].each { |line| puts line }
   end
 end

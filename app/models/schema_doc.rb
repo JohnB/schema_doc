@@ -164,7 +164,14 @@ class SchemaDoc
     end
     
     def dot_models
-      model_names.collect do |model_name|
+      names = model_names
+      if @@model_name
+        relations_hash.each do |model_name,related_models|
+          names << related_models
+        end
+      end
+      
+      names.flatten.uniq.collect do |model_name|
         "\"#{model_name}\" [
           label = \"#{model_name}\"
           href = \"/schema_doc/#{model_name}\"
@@ -213,11 +220,23 @@ class SchemaDoc
     end
   
     def create_svg_file( model = nil )
-      init( model )
       create_dot_file(model)
-      command = "cat #{dot_data_file_path} | #{dot_path} -Tsvg > #{svg_data_file_path(model)}"
+      svg_path = svg_data_file_path(model)
+      # Note that the specification of target="_top" is needed to get links 
+      # to replace the page instead of replacing only the SVG image.
+      command = "cat #{dot_data_file_path} | #{dot_path} -Tsvg | sed 's/xlink:title/target=\"_top\" xlink:title/g' > #{svg_path}"
+      run_command command
+    end
+    
+    def run_command command
       puts "Running command: '#{command}'"
       `#{command}`
+    end
+    
+    def columns_to_document( model )
+      model.constantize.columns.select do |column|
+        column.name !~ /(id|created_at|updated_at)$/
+      end
     end
   
   end  # end of class methods
