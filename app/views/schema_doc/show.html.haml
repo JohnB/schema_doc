@@ -1,23 +1,29 @@
 %h1
   = "SchemaDoc #{@table_to_show}"
+= raw(schema_doc_flash)
 %button{:onclick=>"window.location.href='#{schema_doc_index_path}'"}
   Return to Overview
 %p
   Click on a model name to see the meaning of its columns. 
 %object{:data=>SchemaDoc.svg_public_relative_file_path(@table_to_show),:type=>"image/svg+xml",:viewBox=>nil}
-%table{:border=>"3"}
-  %thead
-    %tr
-      %th Name 
-      %th Datatype 
-      %th Meaning
-  %tbody
-  - SchemaDoc.columns_to_document(@table_to_show).each do |column|
-    %tr
-      %td
-        = column.name
-      %td
-        = column.type
-      %td
-        blah
+= form_for "/SchemaDoc/#{@table_to_show}", :method => :put do
+  %input{ :name=>"_method", :type=>"hidden", :value=>"put"}
+  %table{:border=>"1"}
+    %thead
+      %tr
+        %th Name 
+        %th Datatype 
+        %th Meaning
+    %tbody
+    - @columns.each do |column|
+      %tr
+        %td
+          = column[:name]
+        %td
+          = column[:datatype]
+        %td
+          = text_field( @table_to_show, column[:name], :value => column[:value], :size => column[:size] )
+  = submit_tag "Save any Changes"
+  
+    
             

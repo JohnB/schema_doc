@@ -30,6 +30,7 @@ describe SchemaDoc do
     verify_file_is_created(SchemaDoc.persistent_file_path) do
       SchemaDoc.save({:id => 'SchemaDocSpecBelongsTo', :fields => {"col1a" => "value1a", "col2a" => "value2a#{rand}"}})
     end
+    SchemaDoc['SchemaDocSpecBelongsTo']["col1a"].should == "value1a"
   end
   
   it "should update the file when given new table data" do

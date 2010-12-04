@@ -73,6 +73,10 @@ class SchemaDoc
       File.join(::Rails.root.to_s,svg_data_relative_file_path)
     end
     
+    def [] table_name
+      (schema_hash[:tables][table_name] || {})
+    end
+    
     def schema_hash
       @@schema_hash ||= nil
       @@schema_hash ||= File.exists?(persistent_file_path) ? YAML.load_file(persistent_file_path) : {:tables => {}}
@@ -80,14 +84,13 @@ class SchemaDoc
     
     def save(hash)
       table_name = hash[:id]
-      fields = hash[:fields] || {}
+      fields = hash[table_name.to_sym] || {}
       if table_name
         schema_hash[:tables] ||= {}
         schema_hash[:tables][table_name] ||= {}
         schema_hash[:tables][table_name].merge!(fields)
       end
       File.open(persistent_file_path, "w") { |f| YAML.dump(schema_hash,f) }
-      puts schema_hash.inspect
     end
     
     def force_model_loading
@@ -102,8 +105,6 @@ class SchemaDoc
         ActiveRecord::Base.descendants.collect do |model|
           model.model_name rescue nil
         end
-      # rescue Exception => e
-      #   puts "Something is very wrong: #{e}. #{e.backtrace}"
       end.compact
       
       @@model_name ||= nil
@@ -150,14 +151,12 @@ class SchemaDoc
       
       # Force the set to be unique
       inverse_hash = hash_containing_dupes.inject({}) do |memo,name_and_relations|
-        # puts "memo: #{memo.inspect}, name_and_relations: #{name_and_relations.inspect}."
         memo[name_and_relations.first] = name_and_relations.last.uniq
         memo
       end
 
       # # Get rid of forward-relations (assume we don't go both ways)
       inverse_hash.inject({}) do |memo,name_and_relations|
-        # puts "memo: #{memo.inspect}, name_and_relations: #{name_and_relations.inspect}."
         memo[name_and_relations.first] = name_and_relations.last - (relations_hash[name_and_relations.first] || [])
         memo
       end
@@ -204,13 +203,13 @@ class SchemaDoc
     def svg_public_relative_file_path( model = nil )
       init( model )
       path = '/' + File.join(PUBLIC_RELATIVE_TEMP_PATH, svg_filename)
-      puts "svg_public_relative_file_path(#{model}) => #{path}"
+      # puts "svg_public_relative_file_path(#{model}) => #{path}"
       path
     end
     
     def create_dot_file( model = nil )
       init( model )
-      puts "create_dot_file(#{model}) => #{dot_data_file_path}"
+      # puts "create_dot_file(#{model}) => #{dot_data_file_path}"
       if File.exists?(dot_data_file_path)
         old_data = IO.read(dot_data_file_path)
         return if old_data == dot_data
@@ -229,7 +228,7 @@ class SchemaDoc
     end
     
     def run_command command
-      puts "Running command: '#{command}'"
+      # puts "Running command: '#{command}'"
       `#{command}`
     end
     

@@ -10,16 +10,22 @@ class SchemaDocController < ApplicationController
 
   def show
     @table_to_show = params["id"]
+    @columns = SchemaDoc.columns_to_document(@table_to_show).collect do |column|
+      value = SchemaDoc[@table_to_show][column.name] || ""
+      {:name => column.name,
+       :datatype => column.type,
+       :value => value,
+       :size => [40,value.length].max
+      }
+    end
     SchemaDoc.create_svg_file(@table_to_show)
   end
   
   def update
-    if params[:commit] == "Cancel"
-      flash[:notice] = MSG_CANCELED
-    else
-      SchemaDoc.save(params)
-      flash[:notice] = MSG_SAVED
-    end
+    @table_to_show = params["id"]
+    puts "Saving these params: #{params.inspect}"
+    SchemaDoc.save(params.symbolize_keys)
+    flash[:notice] = MSG_SAVED
     redirect_to :action => 'index'
   end
 
