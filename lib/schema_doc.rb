@@ -88,8 +88,28 @@ class SchemaDoc
       generate_schema_diagram(connected_schema_dot_path, connected_schema_svg_path, :connected_model_names)
     end
     
-    def generate_subsection(model_name)
-      generate_schema_diagram(file(dot(model_name)), file(svg(model_name)), :connected_model_names)
+    def generate_subsection(subsection_model_name)
+      dot_path = file(dot(subsection_model_name))
+      svg_path = file(svg(subsection_model_name))
+      create_dot_file(dot_path,subsection_model_name) do
+        all_model_names.inject({}) do |memo, model_name|
+          begin
+            mr = ModelRelation.new(model_name)
+            related = mr.related_model_names
+            if model_name == subsection_model_name
+              memo[model_name] = related
+              related.each { |model| memo[model] ||= [] }
+            elsif related.include?(subsection_model_name)
+              memo[model_name] = [subsection_model_name]
+              memo[subsection_model_name] ||= []
+            end
+          rescue Exception => e
+            # not a problem - no relation here
+          end
+          memo
+        end
+      end
+      convert_dot_file_to_svg_file(dot_path,svg_path)
     end
     
     def generate_schema_diagram(dot_path, svg_path, method)
@@ -102,10 +122,11 @@ class SchemaDoc
       convert_dot_file_to_svg_file(dot_path,svg_path)
     end
     
-    def create_dot_file(dot_path)
+    def create_dot_file(dot_path,important_model=nil)
       models = yield
       dot_models = models.keys.collect do |model_name|
-        "\"#{model_name}\" [
+        show_importance = (model_name == important_model) ? "\nfontsize = \"12\"" : ''
+        "\"#{model_name}\" [ #{show_importance}
             label = \"#{model_name}\"
             href = \"/schema_doc/#{model_name}\"
           ];"
