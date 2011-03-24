@@ -1,3 +1,4 @@
+require 'spec_helper.rb'
 require 'active_record.rb'
 require 'fileutils'
 require 'schema_doc.rb'
@@ -28,40 +29,6 @@ describe SchemaDoc do
     end
   end
   
-  def expect_dot_contents path, expected_hash, not_expected_list = []
-    File.exists?(path).should be_true "nonexistent #{path}"
-    file_data = IO.read(path)
-    expected_hash.each do |from, to|
-      label = "label = \"#{from}\""
-      file_data.should =~ Regexp.new(label)
-      if to
-        label = "label = \"#{to}\""
-        file_data.should =~ Regexp.new(label)
-        linkage = "\"#{from}\"->\"#{to}\""
-        file_data.should =~ Regexp.new(linkage)
-      end
-    end
-    not_expected_list.each do |table|
-      file_data.should_not =~ Regexp.new(table)
-    end
-  end
-  
-  def full_schema_paths
-    [SchemaDoc.full_schema_svg_path, SchemaDoc.connected_schema_svg_path]
-  end
-  
-  # wrapper for tests that should create files
-  def verify_file_creation list_of_files
-    list_of_files.each do |path|
-      rm_rf path
-      File.exists?(path).should be_false        
-    end
-    yield
-    list_of_files.each do |path|
-      File.exists?(path).should be_true        
-    end
-  end
-
   describe "ensure_overview_images_exist" do
     it "should create full_schema and connected_schema files" do
       verify_file_creation full_schema_paths do
