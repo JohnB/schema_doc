@@ -1,8 +1,7 @@
 require "schema_doc"
 require "rails"
 
-module SchemaDoc
+module SchemaDocEngine
  class Engine < Rails::Engine
-    engine_name :schema_doc
-  end
+ end
 end
