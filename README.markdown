@@ -22,23 +22,11 @@ control.
 
 Installing SchemaDoc
 --------------------
-With Rails 3.1 this should become a Rails Engine but for now it is
-"installed" into your app with a set of symlinks from the schema_doc
-directory.
+  $ gem install schema_doc
 
 #### Dependencies
 * The Graphviz `dot` program must be in your path. Install it from [here][0].
-# `sed` must be in your path (to work around a Graphviz issue)
-
-#### Integration with Your Rails App
-
-    $ git clone git://github.com/JohnB/schema_doc.git
-    $ cd schema_doc
-    $ ruby add_schema_doc_symlinks.rb `full_path_to_your_rails_app`
-
-To see what it will do, just run it with no argument - it will show
-the symlinks to be created and the one file (routes.rb) that would be 
-modified if you gave it the path to your rails app.
+* `sed` must be in your path (to work around a Graphviz issue)
 
 
 #### Other Details
@@ -47,14 +35,11 @@ modified if you gave it the path to your rails app.
 
 ToDo Items
 ----------
-* Create the per-model edit form
-* Find a better way to integrate with a Rails app (such as a Rails 3.1 engine)
 * Improve the page styling
 
 
 Meta
 ----
-
 * Code: `git clone git://github.com/JohnB/schema_doc.git`
 * Home: <http://github.com/JohnB/schema_doc>
 * Bugs: <http://github.com/JohnB/schema_doc/issues>
